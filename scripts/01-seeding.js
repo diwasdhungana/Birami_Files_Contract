@@ -20,72 +20,86 @@ async function main() {
   // Dummy data for records
   const recordsData = [
     {
-      name: "John Doe",
-      DOB: "1990-01-01",
-      bloodType: "O+",
-      gender: "Male",
+      staticData: JSON.stringify({
+        name: "John Doe",
+        DOB: "1990-01-01",
+        bloodType: "O+",
+        gender: "Male",
+      }),
       medicalData: "No known medical conditions",
     },
     {
-      name: "Jane Doe",
-      DOB: "1985-05-15",
-      bloodType: "AB-",
-      gender: "Female",
+      staticData: JSON.stringify({
+        name: "Jane Doe",
+        DOB: "1985-05-15",
+        bloodType: "AB-",
+        gender: "Female",
+      }),
       medicalData: "Hypertension",
     },
     {
-      name: "Jack Smith",
-      DOB: "1975-12-30",
-      bloodType: "A+",
-      gender: "Male",
+      staticData: JSON.stringify({
+        name: "Jack Smith",
+        DOB: "1975-12-30",
+        bloodType: "A+",
+        gender: "Male",
+      }),
       medicalData: "Diabetes",
     },
   ];
 
-  // Propose records
+  let previousRecordId = 0;
+
+  // Propose, verify, and chain records
   for (let data of recordsData) {
-    console.log(`Proposing record for ${data.name}...`);
-    transactionResponse = await birami.proposeRecord(
-      data.name,
-      data.DOB,
-      data.bloodType,
-      data.gender,
+    console.log(`Proposing record with static data: ${data.staticData}...`);
+    let transactionResponse = await birami.connect(creator).proposeRecord(
+      data.staticData,
       data.medicalData,
-      verifier.address
+      verifier.address,
+      previousRecordId // Chain the records
     );
+    let transactionReceipt = await transactionResponse.wait();
+    console.log(
+      `Record proposed. Tx hash: ${transactionReceipt.transactionHash}`
+    );
+
+    // Get the new record ID from the event
+    console.log("from here", transactionReceipt);
+    const event = transactionReceipt.events.find(
+      (event) => event.event === "RecordProposed"
+    );
+    previousRecordId = event.args.recordId;
+
+    console.log(`Verifying record ${previousRecordId}...`);
+    transactionResponse = await birami
+      .connect(verifier)
+      .verifyRecord(previousRecordId);
     transactionReceipt = await transactionResponse.wait();
     console.log(
-      `Record proposed for ${data.name}. Tx hash: ${transactionReceipt.transactionHash}`
+      `Record ${previousRecordId} verified. Tx hash: ${transactionReceipt.transactionHash}`
     );
 
     // Wait for 1 second between transactions to avoid chain congestion
     await wait(1);
   }
 
-  // Verify records
-  for (let i = 1; i <= recordsData.length; i++) {
-    console.log(`Verifying record ${i}...`);
-    transactionResponse = await birami.connect(verifier).verifyRecord(i);
-    transactionReceipt = await transactionResponse.wait();
-    console.log(
-      `Record ${i} verified. Tx hash: ${transactionReceipt.transactionHash}`
-    );
-
-    // Wait for 1 second between transactions to avoid chain congestion
-    await wait(1);
-  }
-
-  // Delete records (by creator or verifier)
-  for (let i = 1; i <= recordsData.length; i++) {
-    console.log(`Deleting record ${i}...`);
-    transactionResponse = await birami.deleteRecord(i);
-    transactionReceipt = await transactionResponse.wait();
-    console.log(
-      `Record ${i} deleted. Tx hash: ${transactionReceipt.transactionHash}`
-    );
-
-    // Wait for 1 second between transactions to avoid chain congestion
-    await wait(1);
+  // Retrieve and log the chain of records for the last record
+  const finalRecordId = previousRecordId;
+  const chainOfRecords = await birami.getChainOfRecords(finalRecordId);
+  console.log("Chain of Records:");
+  for (const record of chainOfRecords) {
+    console.log(`
+      Record ID: ${record.recordId}
+      Previous Record ID: ${record.previousRecordId}
+      Timestamp: ${record.timestamp}
+      Static Data: ${record.staticData}
+      Medical Data: ${record.medicalData}
+      Creator: ${record.creator}
+      Verifier: ${record.verifier}
+      Is Verified: ${record.isVerified}
+      Is Deleted: ${record.isDeleted}
+    `);
   }
 }
 
