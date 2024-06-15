@@ -29,13 +29,19 @@ describe("BiramiFiles", () => {
       gender: "Male",
     });
     const medicalData = "No known medical conditions";
+    const instituteName = "Health Institute";
+    const allergies = "None";
+    const recordDate = "2024-06-15";
 
     beforeEach(async () => {
       transactionResponse = await biramiFiles.proposeRecord(
         staticData,
         medicalData,
         verifier.address,
-        0 // No previous record
+        0, // No previous record
+        instituteName,
+        allergies,
+        recordDate
       );
       transactionReceipt = await transactionResponse.wait();
     });
@@ -52,6 +58,9 @@ describe("BiramiFiles", () => {
       expect(record.isVerified).to.equal(false);
       expect(record.isDeleted).to.equal(false);
       expect(record.previousRecordId).to.equal(0);
+      expect(record.instituteName).to.equal(instituteName);
+      expect(record.allergies).to.equal(allergies);
+      expect(record.recordDate).to.equal(recordDate);
     });
 
     it("should emit a RecordProposed event", async () => {
@@ -63,6 +72,9 @@ describe("BiramiFiles", () => {
       expect(event.args.creator).to.equal(creator.address);
       expect(event.args.verifier).to.equal(verifier.address);
       expect(event.args.previousRecordId).to.equal(0);
+      expect(event.args.instituteName).to.equal(instituteName);
+      expect(event.args.allergies).to.equal(allergies);
+      expect(event.args.recordDate).to.equal(recordDate);
     });
 
     it("should handle proposing a record with a previous record", async () => {
@@ -73,6 +85,9 @@ describe("BiramiFiles", () => {
         gender: "Female",
       });
       const newMedicalData = "Hypertension";
+      const newInstituteName = "New Health Institute";
+      const newAllergies = "Penicillin";
+      const newRecordDate = "2024-06-16";
 
       const previousRecordId = await biramiFiles.recordId();
       await biramiFiles.connect(verifier).verifyRecord(previousRecordId);
@@ -81,7 +96,10 @@ describe("BiramiFiles", () => {
         newStaticData,
         newMedicalData,
         verifier.address,
-        previousRecordId
+        previousRecordId,
+        newInstituteName,
+        newAllergies,
+        newRecordDate
       );
       const newTransactionReceipt = await newTransactionResponse.wait();
       const newRecordId = await biramiFiles.recordId();
@@ -98,13 +116,19 @@ describe("BiramiFiles", () => {
         gender: "Female",
       });
       const invalidMedicalData = "Hypertension";
+      const invalidInstituteName = "Invalid Health Institute";
+      const invalidAllergies = "Peanuts";
+      const invalidRecordDate = "2024-06-17";
 
       await expect(
         biramiFiles.proposeRecord(
           invalidStaticData,
           invalidMedicalData,
           verifier.address,
-          999
+          999,
+          invalidInstituteName,
+          invalidAllergies,
+          invalidRecordDate
         )
       ).to.be.revertedWith("Invalid previousRecordId");
     });
@@ -121,12 +145,18 @@ describe("BiramiFiles", () => {
         gender: "Female",
       });
       const medicalData = "Hypertension";
+      const instituteName = "Health Institute";
+      const allergies = "None";
+      const recordDate = "2024-06-15";
 
       await biramiFiles.proposeRecord(
         staticData,
         medicalData,
         verifier.address,
-        0
+        0,
+        instituteName,
+        allergies,
+        recordDate
       );
       recordId = await biramiFiles.recordId();
     });
@@ -175,12 +205,18 @@ describe("BiramiFiles", () => {
         gender: "Male",
       });
       const medicalData = "Diabetes";
+      const instituteName = "Health Institute";
+      const allergies = "None";
+      const recordDate = "2024-06-15";
 
       await biramiFiles.proposeRecord(
         staticData,
         medicalData,
         verifier.address,
-        0
+        0,
+        instituteName,
+        allergies,
+        recordDate
       );
       recordId = await biramiFiles.recordId();
       await biramiFiles.connect(verifier).verifyRecord(recordId);
@@ -237,16 +273,37 @@ describe("BiramiFiles", () => {
         bloodType: "B+",
         gender: "Male",
       });
+      const instituteName = "Health Institute";
+      const allergies = "None";
+      const recordDate = "2024-06-15";
 
-      await biramiFiles
-        .connect(creator)
-        .proposeRecord(staticData1, "MedicalData1", verifier.address, 0);
-      await biramiFiles
-        .connect(creator)
-        .proposeRecord(staticData2, "MedicalData2", verifier.address, 0);
-      await biramiFiles
-        .connect(creator)
-        .proposeRecord(staticData3, "MedicalData3", verifier.address, 0);
+      await biramiFiles.proposeRecord(
+        staticData1,
+        "Medical Data 1",
+        verifier.address,
+        0,
+        instituteName,
+        allergies,
+        recordDate
+      );
+      await biramiFiles.proposeRecord(
+        staticData2,
+        "Medical Data 2",
+        verifier.address,
+        0,
+        instituteName,
+        allergies,
+        recordDate
+      );
+      await biramiFiles.proposeRecord(
+        staticData3,
+        "Medical Data 3",
+        verifier.address,
+        0,
+        instituteName,
+        allergies,
+        recordDate
+      );
 
       await biramiFiles.connect(verifier).verifyRecord(1);
       await biramiFiles.connect(verifier).verifyRecord(3);
@@ -259,7 +316,7 @@ describe("BiramiFiles", () => {
   });
 
   describe("getRecordsToVerify", () => {
-    it("should return all records to be verified by a specific verifier", async () => {
+    it("should return records to be verified by a particular verifier", async () => {
       const staticData1 = JSON.stringify({
         name: "Name1",
         DOB: "DOB1",
@@ -278,16 +335,37 @@ describe("BiramiFiles", () => {
         bloodType: "B+",
         gender: "Male",
       });
+      const instituteName = "Health Institute";
+      const allergies = "None";
+      const recordDate = "2024-06-15";
 
-      await biramiFiles
-        .connect(creator)
-        .proposeRecord(staticData1, "MedicalData1", verifier.address, 0);
-      await biramiFiles
-        .connect(creator)
-        .proposeRecord(staticData2, "MedicalData2", verifier.address, 0);
-      await biramiFiles
-        .connect(creator)
-        .proposeRecord(staticData3, "MedicalData3", verifier.address, 0);
+      await biramiFiles.proposeRecord(
+        staticData1,
+        "Medical Data 1",
+        verifier.address,
+        0,
+        instituteName,
+        allergies,
+        recordDate
+      );
+      await biramiFiles.proposeRecord(
+        staticData2,
+        "Medical Data 2",
+        verifier.address,
+        0,
+        instituteName,
+        allergies,
+        recordDate
+      );
+      await biramiFiles.proposeRecord(
+        staticData3,
+        "Medical Data 3",
+        verifier.address,
+        0,
+        instituteName,
+        allergies,
+        recordDate
+      );
 
       await biramiFiles.connect(verifier).verifyRecord(1);
 
@@ -301,37 +379,7 @@ describe("BiramiFiles", () => {
   });
 
   describe("getRecordsByCreator", () => {
-    it("should return all records created by a specific creator", async () => {
-      const staticData1 = JSON.stringify({
-        name: "Name1",
-        DOB: "DOB1",
-        bloodType: "O+",
-        gender: "Male",
-      });
-      const staticData2 = JSON.stringify({
-        name: "Name2",
-        DOB: "DOB2",
-        bloodType: "A+",
-        gender: "Female",
-      });
-
-      await biramiFiles
-        .connect(creator)
-        .proposeRecord(staticData1, "MedicalData1", verifier.address, 0);
-      await biramiFiles
-        .connect(unknown)
-        .proposeRecord(staticData2, "MedicalData2", verifier.address, 0);
-
-      const recordsByCreator = await biramiFiles.getRecordsByCreator(
-        creator.address
-      );
-      expect(recordsByCreator.length).to.equal(1);
-      expect(recordsByCreator[0].recordId).to.equal(1);
-    });
-  });
-
-  describe("getRecordsVerifiedBy", () => {
-    it("should return all records verified by a specific verifier", async () => {
+    it("should return all records created by a particular creator", async () => {
       const staticData1 = JSON.stringify({
         name: "Name1",
         DOB: "DOB1",
@@ -350,16 +398,99 @@ describe("BiramiFiles", () => {
         bloodType: "B+",
         gender: "Male",
       });
+      const instituteName = "Health Institute";
+      const allergies = "None";
+      const recordDate = "2024-06-15";
 
-      await biramiFiles
-        .connect(creator)
-        .proposeRecord(staticData1, "MedicalData1", verifier.address, 0);
-      await biramiFiles
-        .connect(creator)
-        .proposeRecord(staticData2, "MedicalData2", verifier.address, 0);
-      await biramiFiles
-        .connect(creator)
-        .proposeRecord(staticData3, "MedicalData3", verifier.address, 0);
+      await biramiFiles.proposeRecord(
+        staticData1,
+        "Medical Data 1",
+        verifier.address,
+        0,
+        instituteName,
+        allergies,
+        recordDate
+      );
+      await biramiFiles.proposeRecord(
+        staticData2,
+        "Medical Data 2",
+        verifier.address,
+        0,
+        instituteName,
+        allergies,
+        recordDate
+      );
+      await biramiFiles.proposeRecord(
+        staticData3,
+        "Medical Data 3",
+        verifier.address,
+        0,
+        instituteName,
+        allergies,
+        recordDate
+      );
+
+      const recordsByCreator = await biramiFiles.getRecordsByCreator(
+        creator.address
+      );
+      expect(recordsByCreator.length).to.equal(3);
+      expect(recordsByCreator[0].recordId).to.equal(1);
+      expect(recordsByCreator[1].recordId).to.equal(2);
+      expect(recordsByCreator[2].recordId).to.equal(3);
+    });
+  });
+
+  describe("getRecordsVerifiedBy", () => {
+    it("should return all records verified by a particular verifier", async () => {
+      const staticData1 = JSON.stringify({
+        name: "Name1",
+        DOB: "DOB1",
+        bloodType: "O+",
+        gender: "Male",
+      });
+      const staticData2 = JSON.stringify({
+        name: "Name2",
+        DOB: "DOB2",
+        bloodType: "A+",
+        gender: "Female",
+      });
+      const staticData3 = JSON.stringify({
+        name: "Name3",
+        DOB: "DOB3",
+        bloodType: "B+",
+        gender: "Male",
+      });
+      const instituteName = "Health Institute";
+      const allergies = "None";
+      const recordDate = "2024-06-15";
+
+      await biramiFiles.proposeRecord(
+        staticData1,
+        "Medical Data 1",
+        verifier.address,
+        0,
+        instituteName,
+        allergies,
+        recordDate
+      );
+      await biramiFiles.proposeRecord(
+        staticData2,
+        "Medical Data 2",
+        verifier.address,
+        0,
+        instituteName,
+        allergies,
+        recordDate
+      );
+      await biramiFiles.proposeRecord(
+        staticData3,
+        "Medical Data 3",
+        verifier.address,
+        0,
+        instituteName,
+        allergies,
+        recordDate
+      );
 
       await biramiFiles.connect(verifier).verifyRecord(1);
       await biramiFiles.connect(verifier).verifyRecord(3);
@@ -374,7 +505,7 @@ describe("BiramiFiles", () => {
   });
 
   describe("getChainOfRecords", () => {
-    it("should return the entire chain of records", async () => {
+    it("should return the chain of records leading up to a given record", async () => {
       const staticData1 = JSON.stringify({
         name: "Name1",
         DOB: "DOB1",
@@ -387,19 +518,49 @@ describe("BiramiFiles", () => {
         bloodType: "A+",
         gender: "Female",
       });
+      const staticData3 = JSON.stringify({
+        name: "Name3",
+        DOB: "DOB3",
+        bloodType: "B+",
+        gender: "Male",
+      });
+      const instituteName = "Health Institute";
+      const allergies = "None";
+      const recordDate = "2024-06-15";
 
-      await biramiFiles
-        .connect(creator)
-        .proposeRecord(staticData1, "MedicalData1", verifier.address, 0);
-      await biramiFiles.connect(verifier).verifyRecord(1);
-      await biramiFiles
-        .connect(creator)
-        .proposeRecord(staticData2, "MedicalData2", verifier.address, 1);
+      await biramiFiles.proposeRecord(
+        staticData1,
+        "Medical Data 1",
+        verifier.address,
+        0,
+        instituteName,
+        allergies,
+        recordDate
+      );
+      await biramiFiles.proposeRecord(
+        staticData2,
+        "Medical Data 2",
+        verifier.address,
+        1,
+        instituteName,
+        allergies,
+        recordDate
+      );
+      await biramiFiles.proposeRecord(
+        staticData3,
+        "Medical Data 3",
+        verifier.address,
+        2,
+        instituteName,
+        allergies,
+        recordDate
+      );
 
-      const chain = await biramiFiles.getChainOfRecords(2);
-      expect(chain.length).to.equal(2);
-      expect(chain[0].recordId).to.equal(2);
-      expect(chain[1].recordId).to.equal(1);
+      const chain = await biramiFiles.getChainOfRecords(3);
+      expect(chain.length).to.equal(3);
+      expect(chain[0].recordId).to.equal(3);
+      expect(chain[1].recordId).to.equal(2);
+      expect(chain[2].recordId).to.equal(1);
     });
   });
 });

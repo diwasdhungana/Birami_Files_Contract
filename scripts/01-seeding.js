@@ -10,14 +10,14 @@ async function main() {
   const { chainId } = await ethers.provider.getNetwork();
   console.log(`Using chainId ${chainId}`);
 
-  const [creator, verifier, extra] = await ethers.getSigners();
+  const [creator, verifier] = await ethers.getSigners();
   const birami = await ethers.getContractAt(
     "BiramiFiles",
     config[chainId].birami.address
   );
   console.log(`BiramiFiles smart contract fetched at ${birami.address}`);
 
-  // Dummy data for records
+  // Updated dummy data for records
   const recordsData = [
     {
       staticData: JSON.stringify({
@@ -27,6 +27,9 @@ async function main() {
         gender: "Male",
       }),
       medicalData: "No known medical conditions",
+      instituteName: "General Hospital",
+      allergies: '["Pollen", "Dust Mites", "Pet Dander", "Mold", "Peanuts"]',
+      recordDate: "2024-06-15",
     },
     {
       staticData: JSON.stringify({
@@ -36,6 +39,9 @@ async function main() {
         gender: "Female",
       }),
       medicalData: "Hypertension",
+      instituteName: "Medical Center",
+      allergies: '["Bee Stings", "Shellfish", "Latex", "Mold", "Tree Nuts"]',
+      recordDate: "2024-06-14",
     },
     {
       staticData: JSON.stringify({
@@ -45,6 +51,9 @@ async function main() {
         gender: "Male",
       }),
       medicalData: "Diabetes",
+      instituteName: "Clinic",
+      allergies: "[]",
+      recordDate: "2024-06-13",
     },
   ];
 
@@ -53,19 +62,23 @@ async function main() {
   // Propose, verify, and chain records
   for (let data of recordsData) {
     console.log(`Proposing record with static data: ${data.staticData}...`);
-    let transactionResponse = await birami.connect(creator).proposeRecord(
-      data.staticData,
-      data.medicalData,
-      verifier.address,
-      previousRecordId // Chain the records
-    );
+    let transactionResponse = await birami
+      .connect(creator)
+      .proposeRecord(
+        data.staticData,
+        data.medicalData,
+        verifier.address,
+        previousRecordId,
+        data.instituteName,
+        data.allergies,
+        data.recordDate
+      );
     let transactionReceipt = await transactionResponse.wait();
     console.log(
       `Record proposed. Tx hash: ${transactionReceipt.transactionHash}`
     );
 
     // Get the new record ID from the event
-    console.log("from here", transactionReceipt);
     const event = transactionReceipt.events.find(
       (event) => event.event === "RecordProposed"
     );
@@ -99,6 +112,9 @@ async function main() {
       Verifier: ${record.verifier}
       Is Verified: ${record.isVerified}
       Is Deleted: ${record.isDeleted}
+      Institute Name: ${record.instituteName}
+      Allergies: ${record.allergies}
+      Record Date: ${record.recordDate}
     `);
   }
 }

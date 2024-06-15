@@ -16,6 +16,9 @@ contract BiramiFiles {
         address verifier;
         bool isVerified;
         bool isDeleted;
+        string instituteName;
+        string allergies;
+        string recordDate; // String type record date
     }
 
     event RecordProposed(
@@ -25,7 +28,10 @@ contract BiramiFiles {
         string medicalData,
         address creator,
         address verifier,
-        uint previousRecordId // New field in the event
+        uint previousRecordId, // New field in the event
+        string instituteName,
+        string allergies,
+        string recordDate
     );
 
     event RecordVerified(uint recordId, address verifier);
@@ -38,7 +44,10 @@ contract BiramiFiles {
         string memory _staticData, // JSON string
         string memory _medicalData,
         address _verifier,
-        uint _previousRecordId // New parameter for previous record ID
+        uint _previousRecordId, // New parameter for previous record ID
+        string memory _instituteName,
+        string memory _allergies,
+        string memory _recordDate
     ) public {
         // Ensure the previousRecordId is valid (i.e., 0 or an existing record ID)
         require(
@@ -49,10 +58,6 @@ contract BiramiFiles {
 
         // Ensure the verifier of the new record is the same as the verifier of the previous record
         if (_previousRecordId != 0) {
-            require(
-                records[_previousRecordId].isVerified,
-                "Previous record must be verified"
-            );
             require(
                 records[_previousRecordId].verifier == _verifier,
                 "Verifier must be the same as the previous record"
@@ -69,7 +74,10 @@ contract BiramiFiles {
             msg.sender,
             _verifier,
             false,
-            false
+            false,
+            _instituteName,
+            _allergies,
+            _recordDate
         );
         emit RecordProposed(
             recordId,
@@ -78,7 +86,10 @@ contract BiramiFiles {
             _medicalData,
             msg.sender,
             _verifier,
-            _previousRecordId // Include the new field
+            _previousRecordId, // Include the new field
+            _instituteName,
+            _allergies,
+            _recordDate
         );
     }
 
@@ -97,11 +108,17 @@ contract BiramiFiles {
 
     function deleteRecord(uint _recordId) public {
         Record storage record = records[_recordId];
+
         require(
             msg.sender == record.creator || msg.sender == record.verifier,
             "Not authorized to delete"
         );
-        require(!record.isDeleted, "Record already deleted");
+        require(!record.isVerified, "Verified record cannot be deleted.");
+        require(!record.isDeleted, "Record already deleted.");
+        require(
+            block.timestamp >= record.timestamp + 24 * 60 * 60,
+            "Cannot delete record within 24 hours of creation."
+        );
 
         record.isDeleted = true;
 
@@ -112,8 +129,7 @@ contract BiramiFiles {
         return records[_recordId];
     }
 
-    // function to retrive all verified records
-    // function to retrive all verified records
+    // Function to retrieve all verified records
     function getVerifiedRecords() public view returns (Record[] memory) {
         uint verifiedRecordCount = 0;
         // First, count the number of verified records

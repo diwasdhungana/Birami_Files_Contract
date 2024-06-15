@@ -67,6 +67,24 @@
         "internalType": "uint256",
         "name": "previousRecordId",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "instituteName",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "allergies",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "recordDate",
+        "type": "string"
       }
     ],
     "name": "RecordProposed",
@@ -154,6 +172,21 @@
             "internalType": "bool",
             "name": "isDeleted",
             "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "instituteName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "allergies",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "recordDate",
+            "type": "string"
           }
         ],
         "internalType": "struct BiramiFiles.Record[]",
@@ -220,6 +253,21 @@
             "internalType": "bool",
             "name": "isDeleted",
             "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "instituteName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "allergies",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "recordDate",
+            "type": "string"
           }
         ],
         "internalType": "struct BiramiFiles.Record[]",
@@ -286,6 +334,21 @@
             "internalType": "bool",
             "name": "isDeleted",
             "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "instituteName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "allergies",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "recordDate",
+            "type": "string"
           }
         ],
         "internalType": "struct BiramiFiles.Record",
@@ -352,6 +415,21 @@
             "internalType": "bool",
             "name": "isDeleted",
             "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "instituteName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "allergies",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "recordDate",
+            "type": "string"
           }
         ],
         "internalType": "struct BiramiFiles.Record[]",
@@ -418,6 +496,21 @@
             "internalType": "bool",
             "name": "isDeleted",
             "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "instituteName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "allergies",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "recordDate",
+            "type": "string"
           }
         ],
         "internalType": "struct BiramiFiles.Record[]",
@@ -484,6 +577,21 @@
             "internalType": "bool",
             "name": "isDeleted",
             "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "instituteName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "allergies",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "recordDate",
+            "type": "string"
           }
         ],
         "internalType": "struct BiramiFiles.Record[]",
@@ -544,6 +652,21 @@
             "internalType": "bool",
             "name": "isDeleted",
             "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "instituteName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "allergies",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "recordDate",
+            "type": "string"
           }
         ],
         "internalType": "struct BiramiFiles.Record[]",
@@ -575,6 +698,21 @@
         "internalType": "uint256",
         "name": "_previousRecordId",
         "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "_instituteName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_allergies",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_recordDate",
+        "type": "string"
       }
     ],
     "name": "proposeRecord",
@@ -649,6 +787,21 @@
         "internalType": "bool",
         "name": "isDeleted",
         "type": "bool"
+      },
+      {
+        "internalType": "string",
+        "name": "instituteName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "allergies",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "recordDate",
+        "type": "string"
       }
     ],
     "stateMutability": "view",
