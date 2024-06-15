@@ -220,4 +220,12 @@ contract BiramiFiles {
 
         return chain;
     }
+
+    function getAllRecords() public view returns (Record[] memory) {
+        Record[] memory allRecords = new Record[](recordId);
+        for (uint i = 1; i <= recordId; i++) {
+            allRecords[i - 1] = records[i];
+        }
+        return allRecords;
+    }
 }

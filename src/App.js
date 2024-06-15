@@ -1,24 +1,55 @@
-import logo from './logo.svg';
-import './App.css';
-
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import AddRecord from "./pages/AddRecord";
+import ViewRecords from "./pages/ViewRecords";
+import DetailView from "./pages/DetailView";
+import HomePage from "./pages/HomePage";
+import { useDispatch, useSelector } from "react-redux";
+import { loadContract, loadNetwork, loadProvider } from "./store/interactions";
+import config from "./config.json";
 function App() {
+  const account = useSelector((state) => state.provider.account);
+  console.log("This is account", account);
+  const dispatch = useDispatch();
+
+  const loadBlockChainData = async () => {
+    const provider = loadProvider(dispatch);
+    const network = await loadNetwork(provider, dispatch);
+    const chainId = network.chainId;
+    const medical_config = config[chainId].BiramiFiles;
+    await loadContract(provider, medical_config.address, dispatch);
+  };
+
+  useEffect(() => {
+    loadBlockChainData();
+  });
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div>
+        <Navbar />
+        <Routes>
+          <Route path="/addRecord" element={<AddRecord />} />
+          <Route path="/viewRecords" element={<ViewRecords />} />
+          <Route path="/detailView/:contractId" element={<DetailView />} />
+          <Route path="/" exact element={<HomePage />} />
+        </Routes>
+        {account && (
+          <ul>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/addRecord">Add Record</Link>
+            </li>
+            <li>
+              <Link to="/viewRecords">View Records</Link>
+            </li>
+          </ul>
+        )}
+      </div>
+    </Router>
   );
 }
 
