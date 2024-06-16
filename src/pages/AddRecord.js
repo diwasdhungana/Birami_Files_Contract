@@ -84,7 +84,7 @@ const AddRecord = () => {
       contract,
       dispatch
     );
-    const allergiesArray = figureOutAllergies(allRecordsfromAddress);
+    // const allergiesArray = figureOutAllergies(allRecordsfromAddress);
 
     // parse the static data.
     const previousRecordParsed = JSON.parse(previousRecordRaw.staticData);
@@ -93,16 +93,12 @@ const AddRecord = () => {
     setBloodType(previousRecordParsed.bloodType);
     setGender(previousRecordParsed.gender);
     setVerifier(previousRecordRaw.verifier);
+    console.log("Previous Record verifier : ", previousRecordRaw.verifier);
     // setAllergies(JSON.parse(previousRecordRaw.allergies));
   };
 
   const submitHandler = async (e) => {
     e.preventDefault();
-
-    if (!isEthereumAddress(verifier)) {
-      alert("Verifier is not a valid Ethereum address");
-      return;
-    }
 
     const staticData = JSON.stringify({
       name,
@@ -118,6 +114,11 @@ const AddRecord = () => {
     if (previousRecordId === "") {
       setPreviousRecordId(0);
     }
+    if (!isEthereumAddress(verifier)) {
+      alert("Verifier is not a valid Ethereum address");
+      return;
+    }
+
     // console.log("Allergies : ", allergiesData);
     await sendRecord(
       staticData,

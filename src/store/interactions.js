@@ -41,6 +41,18 @@ export const loadRecords = async (contract, dispatch) => {
     console.log("error loading records", error);
   }
 };
+
+export const loadRecord = async (recordId, contract, dispatch) => {
+  try {
+    dispatch({ type: "LOADING_RECORD" });
+    const record = await contract.getRecord(recordId);
+    dispatch({ type: "RECORD_LOADED", record });
+    return record;
+  } catch (error) {
+    console.log("error loading record", error);
+  }
+};
+
 export const sendRecord = async (
   staticData,
   medicalData,
@@ -116,5 +128,35 @@ export const getAllVerifiedRecordsfromAddress = async (
   } catch (error) {
     console.log("error loading verified records", error);
     dispatch({ type: "VERIFIED_RECORDS_LOADING_FAILED", error });
+  }
+};
+
+export const verifyRecord = async (recordId, contract, provider, dispatch) => {
+  let transaction;
+  dispatch({ type: "VERIFYING_RECORD" });
+  try {
+    const signer = await provider.getSigner();
+    transaction = await contract.connect(signer).verifyRecord(recordId);
+    transaction.wait();
+    console.log("Verified record:", transaction);
+    dispatch({ type: "RECORD_VERIFIED", data: transaction });
+  } catch (error) {
+    dispatch({ type: "VERIFYING_RECORD_FAILED", error });
+    console.error("Failed to verify record:", error);
+  }
+};
+
+export const deleteRecord = async (recordId, contract, provider, dispatch) => {
+  let transaction;
+  dispatch({ type: "DELETING_RECORD" });
+  try {
+    const signer = await provider.getSigner();
+    transaction = await contract.connect(signer).deleteRecord(recordId);
+    transaction.wait();
+    console.log("Deleted record:", transaction);
+    dispatch({ type: "RECORD_DELETED", data: transaction });
+  } catch (error) {
+    dispatch({ type: "DELETING_RECORD_FAILED", error });
+    console.error("Failed to delete record:", error);
   }
 };

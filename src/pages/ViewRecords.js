@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loadRecords } from "../store/interactions";
-import { useTable, useSortBy } from "react-table";
+import { Link } from "react-router-dom";
 
 const ViewRecords = () => {
   const dispatch = useDispatch();
@@ -32,7 +32,7 @@ const ViewRecords = () => {
         key={rowIndex}
         style={{ backgroundColor: row.isDeleted ? "red" : "white" }}
       >
-        <td>{row.recordId.hex}</td>
+        <td>{Number(row.recordId)}</td>
         <td>{staticData.name}</td>
         <td>{staticData.gender}</td>
         <td>{staticData.DOB}</td>
@@ -49,6 +49,9 @@ const ViewRecords = () => {
           {row.isVerified.toString()}
         </td>
         <td>{row.isDeleted.toString()}</td>
+        <td>
+          <Link to={`/detailView/${row.recordId}`}>View Detail</Link>
+        </td>
       </tr>
     );
   };

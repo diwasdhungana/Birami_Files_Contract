@@ -32,7 +32,7 @@ function App() {
         <Routes>
           <Route path="/addRecord" element={<AddRecord />} />
           <Route path="/viewRecords" element={<ViewRecords />} />
-          <Route path="/detailView/:contractId" element={<DetailView />} />
+          <Route path="/detailView/:recordId" element={<DetailView />} />
           <Route path="/" exact element={<HomePage />} />
         </Routes>
         {account && (

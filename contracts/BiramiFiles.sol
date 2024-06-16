@@ -116,8 +116,8 @@ contract BiramiFiles {
         require(!record.isVerified, "Verified record cannot be deleted.");
         require(!record.isDeleted, "Record already deleted.");
         require(
-            block.timestamp >= record.timestamp + 24 * 60 * 60,
-            "Cannot delete record within 24 hours of creation."
+            block.timestamp >= record.timestamp + 2 * 60,
+            "Cannot delete record within 2 minutes of creation."
         );
 
         record.isDeleted = true;
