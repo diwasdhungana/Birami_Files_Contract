@@ -10,31 +10,28 @@ const DetailView = () => {
   const account = useSelector((state) => state.provider.account);
   const provider = useSelector((state) => state.provider.connection);
   const [record, setRecord] = useState();
+
   const loadInitialRecord = async () => {
     const data = await loadRecord(recordId, contract, dispatch);
-    // console.log("data", data.staticData);
     setRecord(data);
   };
+
   useEffect(() => {
     loadInitialRecord();
   }, []);
 
   const handleVerify = (e) => {
     e.preventDefault();
-    // Add logic to verify the record
-    // console.log("Verify button clicked for record ID:", recordId);
     verifyRecord(recordId, contract, provider, dispatch);
   };
 
   const handleDelete = (e) => {
     e.preventDefault();
-    // Add logic to delete the record
-    // console.log("Delete button clicked for record ID:", recordId);
     deleteRecord(recordId, contract, provider, dispatch);
   };
 
   if (!record) {
-    return <div>Loading...</div>;
+    return <div className="text-center">Loading...</div>;
   }
 
   const staticData = JSON.parse(record.staticData);
@@ -42,77 +39,94 @@ const DetailView = () => {
   const allergies = JSON.parse(record.allergies);
 
   return (
-    <div>
-      <h1>Detail View Page for Record ID: {recordId}</h1>
-      <div>
-        <p>
+    <div className="max-w-3xl mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-4">
+        Detail View for Record ID: {recordId}
+      </h1>
+      <div className="bg-white shadow-md rounded p-4 mb-4">
+        <p className="mb-2">
           <strong>Creator:</strong> {record.creator}
         </p>
-        <p>
+        <p className="mb-2">
           <strong>Previous Record ID:</strong> {Number(record.previousRecordId)}
         </p>
-        <p>
+        <p className="mb-2">
           <strong>Institute Name:</strong> {record.instituteName}
         </p>
-        <p>
+        <p className="mb-2">
           <strong>Record Date:</strong> {record.recordDate}
         </p>
-        <h2>Static Data</h2>
-        <p>
+        <h2 className="text-2xl font-semibold mt-4 mb-2">Static Data</h2>
+        <p className="mb-2">
           <strong>Name:</strong> {staticData.name}
         </p>
-        <p>
+        <p className="mb-2">
           <strong>DOB:</strong> {staticData.DOB}
         </p>
-        <p>
+        <p className="mb-2">
           <strong>Blood Type:</strong> {staticData.bloodType}
         </p>
-        <p>
+        <p className="mb-2">
           <strong>Gender:</strong> {staticData.gender}
         </p>
       </div>
-      <div>
-        <h2>Medical Data</h2>
+      <div className="bg-white shadow-md rounded p-4 mb-4">
+        <h2 className="text-2xl font-semibold mb-2">Medical Data</h2>
         {medicalData.map((detail, index) => (
-          <div key={index}>
-            <p>
+          <div key={index} className="mb-2">
+            <p className="mb-1">
               <strong>Type:</strong> {detail.type}
             </p>
-            <p>
+            <p className="mb-1">
               <strong>Details:</strong> {detail.details}
             </p>
           </div>
         ))}
       </div>
-      <div>
-        <h2>Allergies</h2>
+      <div className="bg-white shadow-md rounded p-4 mb-4">
+        <h2 className="text-2xl font-semibold mb-2">Allergies</h2>
         {allergies.map((allergy, index) => (
-          <span key={index} style={{ marginRight: "10px" }}>
+          <span
+            key={index}
+            className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+          >
             {allergy}
           </span>
         ))}
       </div>
-      <div>
-        <h2>Other Details</h2>
-        <p>
+      <div className="bg-white shadow-md rounded p-4 mb-4">
+        <h2 className="text-2xl font-semibold mb-2">Other Details</h2>
+        <p className="mb-2">
           <strong>Verifier:</strong> {record.verifier}
         </p>
-        <p>
+        <p className="mb-2">
           <strong>Is Verified:</strong> {record.isVerified.toString()}
         </p>
-        <p>
+        <p className="mb-2">
           <strong>Is Deleted:</strong> {record.isDeleted.toString()}
         </p>
       </div>
-      {!record.isVerified && record.verifier === account && (
-        <button onClick={handleVerify}>Verify</button>
-      )}
-
-      {!record.isVerified &&
-        !record.isDeleted &&
-        (record.creator === account || record.verifier === account) && (
-          <button onClick={handleDelete}>Delete</button>
+      <div className="flex space-x-4">
+        {!record.isVerified && record.verifier === account && (
+          <button
+            onClick={handleVerify}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Verify
+          </button>
         )}
+        {!record.isVerified &&
+          !record.isDeleted &&
+          (record.creator === account || record.verifier === account) &&
+          !record.isVerified && (
+            <button
+              onClick={handleDelete}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
+            >
+              Delete
+            </button>
+          )}
+      </div>
     </div>
   );
 };

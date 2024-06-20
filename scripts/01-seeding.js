@@ -22,46 +22,78 @@ async function main() {
     {
       staticData: JSON.stringify({
         name: "John Doe",
-        DOB: "1990-01-01",
+        DOB: "1990",
         bloodType: "O+",
         gender: "Male",
       }),
-      medicalData: "No known medical conditions",
+      medicalData:
+        '[{"type":"checkup","details":"checkup related to headache."},{"type":"medicine","details":"aspirin"}]',
       instituteName: "General Hospital",
       allergies: '["Pollen", "Dust Mites", "Pet Dander", "Mold", "Peanuts"]',
-      recordDate: "2024-06-15",
+      recordDate: "2024-06-15T14:30",
     },
     {
       staticData: JSON.stringify({
         name: "Jane Doe",
-        DOB: "1985-05-15",
+        DOB: "1985",
         bloodType: "AB-",
         gender: "Female",
       }),
-      medicalData: "Hypertension",
+      medicalData:
+        '[{"type":"checkup","details":"checkup related to fever and body ache."},{"type":"medicine","details":"paracetamol"}]',
       instituteName: "Medical Center",
       allergies: '["Bee Stings", "Shellfish", "Latex", "Mold", "Tree Nuts"]',
-      recordDate: "2024-06-14",
+      recordDate: "2024-06-14T09:15",
     },
     {
       staticData: JSON.stringify({
         name: "Jack Smith",
-        DOB: "1975-12-30",
+        DOB: "1975",
         bloodType: "A+",
         gender: "Male",
       }),
-      medicalData: "Diabetes",
+      medicalData:
+        '[{"type":"checkup","details":"checkup related to cough and cold."},{"type":"medicine","details":"cough syrup"}]',
       instituteName: "Clinic",
       allergies: "[]",
-      recordDate: "2024-06-13",
+      recordDate: "2024-06-13T11:45",
     },
+    // Add more records to reach 50
   ];
+
+  // Add additional 47 dummy records with similar pattern
+  for (let i = 4; i <= 50; i++) {
+    recordsData.push({
+      staticData: JSON.stringify({
+        name: `Name ${i}`,
+        DOB: `19${80 + (i % 20)}`,
+        bloodType:
+          i % 4 === 0 ? "A+" : i % 4 === 1 ? "B+" : i % 4 === 2 ? "O+" : "AB-",
+        gender: i % 2 === 0 ? "Male" : "Female",
+      }),
+      medicalData: `[{"type":"checkup","details":"checkup details for record ${i}."},{"type":"medicine","details":"medicine details for record ${i}"}]`,
+      instituteName: `Medical Institute ${i}`,
+      allergies: `["Allergy ${i}A", "Allergy ${i}B"]`,
+      recordDate: `2024-06-${10 + (i % 20)}T10:${(i % 60)
+        .toString()
+        .padStart(2, "0")}`,
+    });
+  }
 
   let previousRecordId = 0;
 
   // Propose, verify, and chain records
   for (let data of recordsData) {
-    console.log(`Proposing record with static data: ${data.staticData}...`);
+    console.log(
+      "all data:",
+      data.staticData,
+      data.medicalData,
+      verifier.address,
+      previousRecordId,
+      data.instituteName,
+      data.allergies,
+      data.recordDate
+    );
     let transactionResponse = await birami
       .connect(creator)
       .proposeRecord(
