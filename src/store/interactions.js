@@ -65,20 +65,10 @@ export const sendRecord = async (
   contract,
   dispatch
 ) => {
-  let transaction;
   dispatch({ type: "SENDING_NEW_RECORD" });
   try {
     const signer = await provider.getSigner();
-    console.log(
-      staticData,
-      medicalData,
-      verifier,
-      previousRecordId,
-      instituteName,
-      allergies,
-      recordDate
-    );
-    transaction = await contract
+    const transaction = await contract
       .connect(signer)
       .proposeRecord(
         staticData,
@@ -89,7 +79,7 @@ export const sendRecord = async (
         allergies,
         recordDate
       );
-    transaction.wait();
+    await transaction.wait();
     console.log("Sent record:", transaction);
     dispatch({ type: "NEW_RECORD_SUCCESS", data: transaction });
   } catch (error) {
@@ -97,7 +87,6 @@ export const sendRecord = async (
     console.error("Failed to send record:", error);
   }
 };
-
 export const getRecordDetailById = async (recordId, contract, dispatch) => {
   try {
     dispatch({ type: "LOADING_RECORD_DETAIL" });
@@ -121,9 +110,8 @@ export const getAllVerifiedRecordsfromAddress = async (
   try {
     dispatch({ type: "LOADING_VERIFIED_RECORDS_OF_ADDRESS" });
     const records = await contract.getRecordsVerifiedBy(address);
-    // console.log("verified records loaded : ", records);
     dispatch({ type: "VERIFIED_RECORDS_LOADED", records });
-    console.log("verified records loaded : ", records);
+    // console.log("verified records loaded : ", records);
     return records;
   } catch (error) {
     console.log("error loading verified records", error);

@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage";
 import { useDispatch, useSelector } from "react-redux";
 import { loadContract, loadNetwork, loadProvider } from "./store/interactions";
 import config from "./config.json";
+import PatientDetails from "./pages/patientRecord";
 
 function App() {
   const account = useSelector((state) => state.provider.account);
@@ -51,6 +52,14 @@ function App() {
                   View Records
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/patientRecord"
+                  className="text-blue-500 hover:underline"
+                >
+                  patient Records
+                </Link>
+              </li>
             </ul>
           )}
           <Routes>
@@ -58,6 +67,7 @@ function App() {
             <Route path="/viewRecords" element={<ViewRecords />} />
             <Route path="/detailView/:recordId" element={<DetailView />} />
             <Route path="/" exact element={<HomePage />} />
+            <Route path="/patientRecord" element={<PatientDetails />} />
           </Routes>
         </div>
       </div>

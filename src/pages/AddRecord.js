@@ -57,16 +57,27 @@ const AddRecord = () => {
     setAllergies(newAllergies);
   };
 
-  const figureOutAllergies = (records) => {
-    let allergiesArray = [];
-    for (let record of records) {
-      let allergies = JSON.parse(record.allergies);
-      allergiesArray = allergiesArray.concat(allergies);
-      console.log("Allergies : ", allergies);
-    }
-    console.log("All allergies : ", allergiesArray);
-    return allergiesArray;
-  };
+  // const figureOutAllergies = (records) => {
+  //   const allergyCount = {};
+
+  //   // Count the occurrences of each allergy
+  //   records.forEach((record) => {
+  //     JSON.parse(record.allergies).forEach((allergy) => {
+  //       if (allergyCount[allergy]) {
+  //         allergyCount[allergy]++;
+  //       } else {
+  //         allergyCount[allergy] = 1;
+  //       }
+  //     });
+  //   });
+
+  //   // Filter allergies that appear an odd number of times
+  //   const oddAllergies = Object.keys(allergyCount).filter(
+  //     (allergy) => allergyCount[allergy] % 2 !== 0
+  //   );
+
+  //   return oddAllergies;
+  // };
 
   const getStaticData = async () => {
     // Placeholder function to simulate fetching data
@@ -79,12 +90,13 @@ const AddRecord = () => {
       alert("Record not found");
       return;
     }
-    const allRecordsfromAddress = await getAllVerifiedRecordsfromAddress(
-      previousRecordRaw.verifier,
-      contract,
-      dispatch
-    );
+    // const allRecordsfromAddress = await getAllVerifiedRecordsfromAddress(
+    //   previousRecordRaw.verifier,
+    //   contract,
+    //   dispatch
+    // );
     // const allergiesArray = figureOutAllergies(allRecordsfromAddress);
+    // console.log("Allergies : ", allergiesArray);
 
     // parse the static data.
     const previousRecordParsed = JSON.parse(previousRecordRaw.staticData);
@@ -94,7 +106,7 @@ const AddRecord = () => {
     setGender(previousRecordParsed.gender);
     setVerifier(previousRecordRaw.verifier);
     console.log("Previous Record verifier : ", previousRecordRaw.verifier);
-    // setAllergies(JSON.parse(previousRecordRaw.allergies));
+    // setAllergies(allergiesArray);
   };
 
   const submitHandler = async (e) => {
